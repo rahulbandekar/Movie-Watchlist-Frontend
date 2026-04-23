@@ -4,7 +4,7 @@ const API_URL = "https://movie-watchlist-api-euko.onrender.com";
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // Still send cookies for production
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
