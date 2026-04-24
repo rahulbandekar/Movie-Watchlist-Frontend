@@ -1,22 +1,52 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { addToWatchlist } from "../services/watchlistService";
+import { addToWatchlist, getUserWatchlist } from "../services/watchlistService";
 import { Calendar, Clock, Plus, Check, Film } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const MovieCard = ({ movie }) => {
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [message, setMessage] = useState("");
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [checkingWatchlist, setCheckingWatchlist] = useState(true);
   const navigate = useNavigate();
+
+  // Check if movie is already in user's watchlist
+  useEffect(() => {
+    const checkWatchlist = async () => {
+      if (!user) {
+        setCheckingWatchlist(false);
+        return;
+      }
+
+      try {
+        const result = await getUserWatchlist();
+        if (result.success) {
+          const isInList = result.data.data.some(
+            (item) => item.movieId === movie.id
+          );
+          setInWatchlist(isInList);
+          if (isInList) {
+            setAdded(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking watchlist:", error);
+      } finally {
+        setCheckingWatchlist(false);
+      }
+    };
+
+    checkWatchlist();
+  }, [user, movie.id]);
 
   const handleAddToWatchlist = async () => {
     if (!user) {
       setMessage("Please login first");
       setTimeout(() => setMessage(""), 3000);
-      navigate('/login', { state: { from: '/' } });
+      navigate("/login", { state: { from: "/" } });
       return;
     }
 
@@ -27,13 +57,24 @@ const MovieCard = ({ movie }) => {
     });
     if (result.success) {
       setAdded(true);
+      setInWatchlist(true);
       setMessage("Added to watchlist!");
     } else {
-      setMessage(result.message);
+      // Check if movie is already in watchlist
+      if (result.message === "Movie already in the watchlist") {
+        setAdded(true);
+        setInWatchlist(true);
+        setMessage("Movie is already in your watchlist");
+      } else {
+        setMessage(result.message);
+      }
     }
     setTimeout(() => setMessage(""), 3000);
     setAdding(false);
   };
+
+  // Determine if button should be disabled
+  const isDisabled = adding || added || checkingWatchlist;
 
   return (
     <div className="movie-card group">
@@ -91,17 +132,17 @@ const MovieCard = ({ movie }) => {
           </Link>
           <button
             onClick={handleAddToWatchlist}
-            disabled={adding || added}
+            disabled={isDisabled}
             className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
               added
-                ? "bg-green-600 cursor-default"
+                ? "bg-green-600 cursor-default opacity-75"
                 : "bg-primary hover:bg-red-700 hover:scale-105"
             }`}
           >
             {added ? (
               <>
                 <Check className="w-4 h-4" />
-                <span>Added</span>
+                <span>{checkingWatchlist ? "Loading..." : "Added"}</span>
               </>
             ) : (
               <>
@@ -115,7 +156,9 @@ const MovieCard = ({ movie }) => {
         {message && (
           <div
             className={`mt-3 text-center text-sm ${
-              added || message === "Added to watchlist!"
+              added ||
+              message === "Added to watchlist!" ||
+              message === "Movie is already in your watchlist"
                 ? "text-green-500"
                 : "text-red-500"
             }`}
