@@ -34,11 +34,22 @@ const Watchlist = () => {
   }, [user, navigate]);
 
   const fetchWatchlist = async () => {
-    const result = await getUserWatchlist();
-    if (result.success) {
-      setWatchlist(result.data.data);
+    try {
+      const result = await getUserWatchlist();
+      console.log("Fetch watchlist result:", result);
+      
+      if (result.success) {
+        // result.data is now the array of watchlist items
+        setWatchlist(result.data || []);
+        console.log("Watchlist items:", result.data);
+      } else {
+        console.error("Failed to fetch:", result.message);
+      }
+    } catch (error) {
+      console.error("Error fetching watchlist:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleStatusUpdate = async (id, newStatus) => {

@@ -15,7 +15,8 @@ export const addToWatchlist = async (watchlistData) => {
 export const getUserWatchlist = async () => {
   try {
     const response = await api.get('/watchlist');
-    return { success: true, data: response.data };
+    const watchlistData = response.data.data || response.data;
+    return { success: true, data: watchlistData };
   } catch (error) {
     return { 
       success: false, 
