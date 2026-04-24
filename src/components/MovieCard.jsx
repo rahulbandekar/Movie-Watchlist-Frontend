@@ -3,17 +3,20 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { addToWatchlist } from "../services/watchlistService";
 import { Calendar, Clock, Plus, Check, Film } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const MovieCard = ({ movie }) => {
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleAddToWatchlist = async () => {
     if (!user) {
       setMessage("Please login first");
       setTimeout(() => setMessage(""), 3000);
+      navigate('/login', { state: { from: '/' } });
       return;
     }
 

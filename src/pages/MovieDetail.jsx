@@ -39,7 +39,7 @@ const MovieDetail = () => {
 
   const handleAddToWatchlist = async () => {
     if (!user) {
-      navigate("/login");
+      navigate('/login', { state: { from: `/movies/${id}` } });
       return;
     }
 
