@@ -13,24 +13,29 @@ const MovieCard = ({ movie }) => {
   const [checkingWatchlist, setCheckingWatchlist] = useState(true);
   const navigate = useNavigate();
 
-  // Check if movie is already in user's watchlist
+  
   useEffect(() => {
     const checkWatchlist = async () => {
       if (!user) {
         setCheckingWatchlist(false);
+        setAdded(false);
         return;
       }
 
       try {
+        setCheckingWatchlist(true);
         const result = await getUserWatchlist();
+        console.log("Watchlist check result:", result);
+
         if (result.success) {
-          const isInList = result.data.data.some(
+          // result.data is the array of watchlist items
+          const watchlistArray = result.data || [];
+          const isInList = watchlistArray.some(
             (item) => item.movieId === movie.id
           );
+          console.log(`Movie ${movie.id} in watchlist:`, isInList);
           setInWatchlist(isInList);
-          if (isInList) {
-            setAdded(true);
-          }
+          setAdded(isInList);
         }
       } catch (error) {
         console.error("Error checking watchlist:", error);
