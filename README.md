@@ -74,7 +74,7 @@ echo "VITE_API_URL=http://localhost:5001" > .env
 
 # Start development server
 npm run dev
-
+```
 
 ## 🔗 API Integration
 
@@ -140,6 +140,7 @@ npm install -g vercel
 
 # Deploy
 vercel --prod
+```
 
 ### Manual Deployment via GitHub
 
@@ -166,15 +167,16 @@ The `vercel.json` file handles client-side routing:
       }
     ]
   }
+```
 
-  ## 🧪 Testing the App
+## 🧪 Testing the App
 
 ### Test Credentials
 
 ```text
 Email: test@example.com
 Password: 123456
-
+```
 
 ### Test Flow
 
@@ -192,7 +194,7 @@ Password: 123456
 
 ```bash
 npm run build
-
+```
 The build output will be in the `dist/` folder.
 
 ## 🤝 Related Repository
